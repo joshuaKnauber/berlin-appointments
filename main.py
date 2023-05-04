@@ -10,10 +10,10 @@ def get_appointments(service: str):
     URL = "https://service.berlin.de/dienstleistungen/"
 
     chrome_options = Options()
-    # chrome_options.add_argument("--headless")
-    # chrome_options.add_argument("--disable-gpu")
-    # chrome_options.add_argument("--no-sandbox")
-    # chrome_options.add_argument("--disable-dev-shm-usage")
+    chrome_options.add_argument("--headless")
+    chrome_options.add_argument("--disable-gpu")
+    chrome_options.add_argument("--no-sandbox")
+    chrome_options.add_argument("--disable-dev-shm-usage")
     driver = webdriver.Chrome(options=chrome_options)
     try:
         driver.get(URL)
@@ -27,7 +27,7 @@ def get_appointments(service: str):
         time.sleep(1)
 
         # find all td elements with class 'buchbar'
-        cells = driver.find_elements(By.CSS_SELECTOR, "td.nichtbuchbar")
+        cells = driver.find_elements(By.CSS_SELECTOR, "td.buchbar")
 
         days = []
         for cell in cells:
