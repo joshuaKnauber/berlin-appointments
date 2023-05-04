@@ -8,6 +8,9 @@ WORKDIR /app
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
     curl unzip gnupg \
+    libx11-xcb1 libxcomposite1 libxcursor1 libxdamage1 libxext6 libxi6 \
+    libxtst6 libnss3 libcups2 libxss1 libxrandr2 libasound2 libpangocairo-1.0-0 \
+    libatk1.0-0 libgtk-3-0 libgdk-pixbuf2.0-0 libatspi2.0-0 \
     && \
     curl -sS -o - https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key add - && \
     echo "deb [arch=amd64]  http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google-chrome.list && \

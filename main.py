@@ -1,45 +1,54 @@
 from selenium import webdriver
 from selenium.webdriver.common.by import By
+from selenium.webdriver.chrome.options import Options
 import time
 import requests
 import fastapi
-import uvicorn
 
 
-def get_appointments():
+def get_appointments(service: str):
     URL = "https://service.berlin.de/dienstleistungen/"
 
-    driver = webdriver.Chrome()
-    driver.get(URL)
+    chrome_options = Options()
+    # chrome_options.add_argument("--headless")
+    # chrome_options.add_argument("--disable-gpu")
+    # chrome_options.add_argument("--no-sandbox")
+    # chrome_options.add_argument("--disable-dev-shm-usage")
+    driver = webdriver.Chrome(options=chrome_options)
+    try:
+        driver.get(URL)
 
-    # navigate to a with 'Personalausweis beantragen'
-    driver.find_element(By.LINK_TEXT, "Personalausweis beantragen").click()
-    time.sleep(1)
+        # navigate to a with 'Personalausweis beantragen'
+        driver.find_element(By.LINK_TEXT, service).click()
+        time.sleep(1)
 
-    # navigate to a with 'Termin berlinweit suchen'
-    driver.find_element(By.LINK_TEXT, "Termin berlinweit suchen").click()
-    time.sleep(1)
+        # navigate to a with 'Termin berlinweit suchen'
+        driver.find_element(By.LINK_TEXT, "Termin berlinweit suchen").click()
+        time.sleep(1)
 
-    # find all td elements with class 'buchbar'
-    cells = driver.find_elements(By.CSS_SELECTOR, "td.nichtbuchbar")
+        # find all td elements with class 'buchbar'
+        cells = driver.find_elements(By.CSS_SELECTOR, "td.nichtbuchbar")
 
-    days = []
-    for cell in cells:
-        # get three parents up
-        table = cell.find_element(By.XPATH, "..").find_element(
-            By.XPATH, "..").find_element(By.XPATH, "..")
-        month = table.find_element(By.CSS_SELECTOR, "th.month")
-        days.append(f"{cell.text} {month.text}")
+        days = []
+        for cell in cells:
+            a = cell.find_element(By.TAG_NAME, "a")
+            try:
+                a = cell.find_element(By.TAG_NAME, "a")
+                days.append(a.get_attribute("title").split(" -")[0])
+            except:
+                days.append(cell.text)
 
-    message = ""
-    if len(days) > 0:
-        message = f"""
-        @everyone
-        Appointments on:
-        {", ".join(days)}
+        message = ""
+        if len(days) > 0:
+            message = f"""
+            @everyone
+            Appointments on:
+            {", ".join(days)}
 
-        https://service.berlin.de/dienstleistungen/#dl_P
-        """
+            https://service.berlin.de/dienstleistungen/#dl_P
+            """
+    except Exception as e:
+        message = f"Error: {e}"
 
     driver.quit()
 
@@ -51,17 +60,17 @@ app = fastapi.FastAPI()
 
 @app.get("/")
 def root():
-    return {"message": "Hello World"}
-
-
-@app.post("/appointments")
-def appointments():
-    message = get_appointments()
-    if message:
-        discord_webhook = "https://discord.com/api/webhooks/1084195487848075374/dUBzfNjmQd-BA872zAMm9eaKI1GHIvE2B3G0d1mArXvlkaQyCCNvSdF4-NWD_NDvkgUC"
-        requests.post(discord_webhook, json={"content": message})
+    message = get_appointments(service="Personalausweis beantragen")
     return {"message": message}
 
 
-if __name__ == "__main__":
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+@app.post("/appointments")
+def appointments(service: str, discord_webhook: str, report_failed: bool):
+    message = get_appointments(service)
+    if discord_webhook:
+        if message:
+            requests.post(discord_webhook, json={"content": message})
+        elif report_failed:
+            requests.post(discord_webhook, json={
+                          "content": "No appointments found"})
+    return {"message": message}
