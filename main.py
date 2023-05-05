@@ -1,6 +1,7 @@
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
 import time
 import requests
 import fastapi
@@ -10,15 +11,10 @@ import uvicorn
 def get_appointments(service: str):
     URL = "https://service.berlin.de/dienstleistungen/"
 
-    print("init webdriver")
-    chrome_options = webdriver.ChromeOptions()
-    chrome_options.add_argument("--headless")
-    chrome_options.add_argument("--no-sandbox")
-    chrome_options.add_argument("--disable-dev-shm-usage")
-    chrome_options.add_argument("--disable-gpu")
-    chrome_options.add_argument("--remote-debugging-port=9222")
-    chrome_options.add_argument("--verbose")
-    driver = webdriver.Chrome(options=chrome_options)
+    driver = webdriver.Remote(
+        command_executor="http://localhost:4444/wd/hub",
+        desired_capabilities=DesiredCapabilities.CHROME,
+    )
     try:
         driver.get(URL)
 
