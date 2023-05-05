@@ -1,29 +1,29 @@
-# Use the official Selenium Standalone Chrome image as the base image
-FROM selenium/standalone-chrome:4.1.0
+FROM python:3.9-slim-buster
 
-# Set the working directory
-WORKDIR /app
+RUN mkdir -p /usr/src/app/
+WORKDIR /usr/src/app/
 
-# Set the environment variable for Python output buffering
+COPY ./app /usr/src/app/
+
+COPY ./app/requirements.txt .
+RUN pip3 install --no-cache-dir wheel
+RUN pip3 install --no-cache-dir -r requirements.txt
+
+RUN apt-get update && \
+    apt-get install -y gnupg wget curl unzip --no-install-recommends && \
+    wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key add - && \
+    echo "deb http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google.list && \
+    apt-get update -y && \
+    apt-get install -y google-chrome-stable && \
+    CHROME_VERSION=$(google-chrome --product-version | grep -o "[^\.]*\.[^\.]*\.[^\.]*") && \
+    CHROMEDRIVER_VERSION=$(curl -s "https://chromedriver.storage.googleapis.com/LATEST_RELEASE_$CHROME_VERSION") && \
+    wget -q --continue -P /chromedriver "http://chromedriver.storage.googleapis.com/$CHROMEDRIVER_VERSION/chromedriver_linux64.zip" && \
+    unzip /chromedriver/chromedriver* -d /usr/src/app/chromedriver/
+
+# make sure all messages always reach console
 ENV PYTHONUNBUFFERED=1
 
-# Install Python and other required packages
-USER root
-RUN apt-get update && \
-    apt-get install -y --no-install-recommends python3.9 python3-pip && \
-    rm -rf /var/lib/apt/lists/* /var/cache/apt/*
-
-# Copy requirements.txt to the container
-COPY ./app/requirements.txt .
-
-# Install Python dependencies
-RUN pip install --no-cache-dir -r requirements.txt
-
-# Copy the rest of the application code to the container
-COPY ./app .
-
-# Expose the API port
+# Expose the FastAPI port
 EXPOSE 8000
 
-# Start the FastAPI application
 CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]

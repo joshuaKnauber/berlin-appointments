@@ -15,9 +15,7 @@ def get_appointments(service: str):
     options.add_argument("--disable-gpu")
     options.add_argument("--no-sandbox")
     options.add_argument("--disable-dev-shm-usage")
-    driver = webdriver.Remote(
-        command_executor="http://localhost:4444/wd/hub", options=options
-    )
+    driver = webdriver.Chrome(options=options)
     try:
         driver.get(URL)
 
