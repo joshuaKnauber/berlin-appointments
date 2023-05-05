@@ -12,10 +12,12 @@ def get_appointments(service: str):
     URL = "https://service.berlin.de/dienstleistungen/"
 
     options = Options()
-    options.add_argument("--headless")
+    options.headless = True
     options.add_argument("--disable-gpu")
+    options.add_argument("--window-size=1280x1024")
     options.add_argument("--no-sandbox")
     options.add_argument("--disable-dev-shm-usage")
+    options.add_argument("--remote-debugging-port=9222")
     chromedriver_path = os.path.join(os.getcwd(), "chromedriver", "chromedriver")
     driver = webdriver.Chrome(executable_path=chromedriver_path, options=options)
     try:
