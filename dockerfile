@@ -13,6 +13,10 @@ RUN apt-get update && \
     echo "deb [arch=amd64]  http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google-chrome.list && \
     apt-get -y update && \
     apt-get -y install google-chrome-stable && \
+    apt-get install -y --no-install-recommends \
+    libx11-xcb1 libxcomposite1 libxcursor1 libxdamage1 libxext6 libxi6 \
+    libxtst6 libnss3 libcups2 libxss1 libxrandr2 libasound2 libpangocairo-1.0-0 \
+    libatk1.0-0 libgtk-3-0 libgdk-pixbuf2.0-0 libatspi2.0-0 && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
