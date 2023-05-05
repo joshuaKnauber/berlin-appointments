@@ -12,15 +12,12 @@ RUN apt-get update && \
     libxtst6 libnss3 libcups2 libxss1 libxrandr2 libasound2 libpangocairo-1.0-0 \
     libatk1.0-0 libgtk-3-0 libgdk-pixbuf2.0-0 libatspi2.0-0 \
     && \
-    curl -sS -o - https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key add - && \
-    echo "deb [arch=amd64]  http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google-chrome.list && \
-    apt-get -y update && \
-    apt-get -y install google-chrome-stable && \
+    apt-get -y install chromium && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
 # Install Chrome WebDriver
-RUN CHROME_VERSION=$(google-chrome --product-version) && \
+RUN CHROME_VERSION=$(chromium --product-version) && \
     CHROME_MAJOR_VERSION=$(echo $CHROME_VERSION | cut -d'.' -f1) && \
     CHROMEDRIVER_VERSION=$(curl -sS https://chromedriver.storage.googleapis.com/LATEST_RELEASE_$CHROME_MAJOR_VERSION) && \
     curl -sS -o /tmp/chromedriver_linux64.zip https://chromedriver.storage.googleapis.com/$CHROMEDRIVER_VERSION/chromedriver_linux64.zip && \
