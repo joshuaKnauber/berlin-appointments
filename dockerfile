@@ -1,6 +1,9 @@
 # Use the official Selenium Standalone Chrome image as the base image
 FROM selenium/standalone-chrome:4.1.0
 
+# Expose the selenium port
+EXPOSE 4444
+
 # Set the working directory
 WORKDIR /app
 
@@ -24,9 +27,6 @@ COPY . .
 
 # Expose the API port
 EXPOSE 8000
-
-# Expose the selenium port
-EXPOSE 4444
 
 # Start the FastAPI application
 CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
