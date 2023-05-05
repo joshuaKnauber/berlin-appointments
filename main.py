@@ -4,6 +4,7 @@ from selenium.webdriver.chrome.options import Options
 import time
 import requests
 import fastapi
+import uvicorn
 
 
 def get_appointments(service: str):
@@ -74,3 +75,6 @@ def appointments(service: str, discord_webhook: str, report_failed: bool):
             requests.post(discord_webhook, json={
                           "content": "No appointments found"})
     return {"message": message}
+
+if __name__ == "__main__":
+    uvicorn.run(app, host="0.0.0.0", port=8000)
