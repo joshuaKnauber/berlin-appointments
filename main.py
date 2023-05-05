@@ -10,11 +10,13 @@ import uvicorn
 def get_appointments(service: str):
     URL = "https://service.berlin.de/dienstleistungen/"
 
-    chrome_options = Options()
+    chrome_options = webdriver.ChromeOptions()
     chrome_options.add_argument("--headless")
-    chrome_options.add_argument("--disable-gpu")
     chrome_options.add_argument("--no-sandbox")
     chrome_options.add_argument("--disable-dev-shm-usage")
+    chrome_options.add_argument("--disable-gpu")
+    chrome_options.add_argument("--remote-debugging-port=9222")
+    chrome_options.add_argument("--verbose")
     driver = webdriver.Chrome(options=chrome_options)
     try:
         driver.get(URL)
@@ -75,6 +77,7 @@ def appointments(service: str, discord_webhook: str, report_failed: bool):
             requests.post(discord_webhook, json={
                           "content": "No appointments found"})
     return {"message": message}
+
 
 if __name__ == "__main__":
     uvicorn.run(app, host="0.0.0.0", port=8000)
