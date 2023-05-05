@@ -4,7 +4,6 @@ FROM python:3.9-slim
 # Set the working directory
 WORKDIR /app
 
-# Install system dependencies
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
     curl unzip gnupg \
@@ -13,8 +12,6 @@ RUN apt-get update && \
     echo "deb [arch=amd64]  http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google-chrome.list && \
     apt-get -y update && \
     apt-get -y install google-chrome-stable && \
-    apt-get install -y --no-install-recommends \
-    libglib2.0-0 libnss3-dev libx11-dev libxkbcommon-x11-0 && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
