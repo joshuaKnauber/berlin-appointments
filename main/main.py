@@ -15,7 +15,9 @@ def get_appointments(service: str):
     options.add_argument("--disable-gpu")
     options.add_argument("--no-sandbox")
     options.add_argument("--disable-dev-shm-usage")
-    driver = webdriver.Chrome(options=options)
+    driver = webdriver.Remote(
+        command_executor="http://localhost:4444/wd/hub", options=options
+    )
     try:
         driver.get(URL)
 
@@ -72,8 +74,7 @@ def appointments(service: str, discord_webhook: str, report_failed: bool):
         if message:
             requests.post(discord_webhook, json={"content": message})
         elif report_failed:
-            requests.post(discord_webhook, json={
-                          "content": "No appointments found"})
+            requests.post(discord_webhook, json={"content": "No appointments found"})
     return {"message": message}
 
 
