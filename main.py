@@ -11,7 +11,7 @@ def get_appointments(service: str):
     URL = "https://service.berlin.de/dienstleistungen/"
 
     options = Options()
-    options.headless = True
+    options.add_argument("--headless")
     options.add_argument("--disable-gpu")
     options.add_argument("--window-size=1280x1024")
     options.add_argument("--no-sandbox")
