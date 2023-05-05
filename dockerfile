@@ -1,22 +1,17 @@
-# Use the official Python image with buster as the base image
-FROM python:3.9-slim-buster
-
-# Install dependencies required for Chrome and ChromeDriver
-RUN apt-get update && \
-    apt-get install -y --no-install-recommends wget gnupg2 curl unzip && \
-    wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key add - && \
-    echo 'deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main' > /etc/apt/sources.list.d/google.list && \
-    apt-get update && \
-    apt-get install -y --no-install-recommends google-chrome-stable && \
-    rm -rf /var/lib/apt/lists/* /var/cache/apt/*
-
-# Install ChromeDriver using Puppeteer's installation script
-RUN PUPPETEER_PRODUCT=chrome PUPPETEER_SKIP_DOWNLOAD=true \
-    pip install --no-cache-dir -U puppeteer && \
-    python -m playwright install
+# Use the official Selenium Standalone Chrome image as the base image
+FROM selenium/standalone-chrome:4.1.0
 
 # Set the working directory
 WORKDIR /app
+
+# Set the environment variable for Python output buffering
+ENV PYTHONUNBUFFERED=1
+
+# Install Python and other required packages
+USER root
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends python3.9 python3-pip && \
+    rm -rf /var/lib/apt/lists/* /var/cache/apt/*
 
 # Copy requirements.txt to the container
 COPY requirements.txt .
