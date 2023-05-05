@@ -10,6 +10,7 @@ import uvicorn
 def get_appointments(service: str):
     URL = "https://service.berlin.de/dienstleistungen/"
 
+    print("init webdriver")
     chrome_options = webdriver.ChromeOptions()
     chrome_options.add_argument("--headless")
     chrome_options.add_argument("--no-sandbox")
