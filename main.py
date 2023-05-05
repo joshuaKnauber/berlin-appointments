@@ -5,7 +5,6 @@ import time
 import requests
 import fastapi
 import uvicorn
-import os
 
 
 def get_appointments(service: str):
@@ -18,8 +17,7 @@ def get_appointments(service: str):
     options.add_argument("--no-sandbox")
     options.add_argument("--disable-dev-shm-usage")
     options.add_argument("--remote-debugging-port=9222")
-    chromedriver_path = os.path.join(os.getcwd(), "chromedriver", "chromedriver")
-    driver = webdriver.Chrome(executable_path=chromedriver_path, options=options)
+    driver = webdriver.Chrome(options=options)
     try:
         driver.get(URL)
 
