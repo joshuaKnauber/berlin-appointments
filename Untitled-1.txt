@@ -1,5 +1,0 @@
-{
-  serviceId: 324325,
-  locationId: 330132,
-  discord_webhook: "https://discord.com/api/webhooks/1105107441378668625/znsPuvjE7VhSSR7bwxv2bTC31nyBoVzveMmCu8b9olHaTAepdfEpULVCDkGSzdaKIWnO"
-}
