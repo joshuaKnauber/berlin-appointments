@@ -2,6 +2,7 @@ import requests
 from bs4 import BeautifulSoup
 import fastapi
 import uvicorn
+from typing import List
 
 
 def get_url(serviceId: str, locationId: str) -> str:
@@ -11,7 +12,7 @@ def get_url(serviceId: str, locationId: str) -> str:
     return URL
 
 
-def get_appointments(url: str) -> list[str]:
+def get_appointments(url: str) -> List[str]:
     response = requests.get(url)
     response.raise_for_status()
 
