@@ -1,8 +1,12 @@
 import requests
 from bs4 import BeautifulSoup
-import fastapi
-import uvicorn
 from typing import List
+import time
+from dotenv import load_dotenv
+import os
+
+
+load_dotenv()
 
 
 def get_url(serviceId: str, locationId: str) -> str:
@@ -38,31 +42,20 @@ def get_discord_message(url: str) -> str:
         return f"Something went wrong: {e}"
 
 
-app = fastapi.FastAPI()
-
-
-@app.get("/health")
-def root():
-    url = get_url(serviceId="324325", locationId="330132")
-    msg = get_discord_message(url)
-    return {"message": msg}
-
-
-@app.post("/appointments")
-def appointments(
-    serviceId: str, locationId: str, discord_webhook: str, report_failed: bool
-):
-    url = get_url(serviceId, locationId)
-    msg = get_discord_message(url)
-    if discord_webhook:
-        if msg:
-            requests.post(discord_webhook, json={"content": msg})
-        elif report_failed:
-            requests.post(discord_webhook, json={"content": "No appointments found"})
-
-
 if __name__ == "__main__":
-    uvicorn.run(app, host="0.0.0.0", port=8000)
-    # url = get_url(serviceId="324325", locationId="330132")
-    # msg = get_discord_message(url)
-    # print(msg)
+    while True:
+        print("Checking for appointments...")
+        url = get_url(os.getenv("SERVICE_ID"), os.getenv("LOCATION_ID"))
+        msg = get_discord_message(url)
+        if msg:
+            print("Found appointments!")
+            requests.post(os.getenv("DISCORD_WEBHOOK"), json={"content": msg})
+        elif (
+            os.getenv("REPORT_FAILED") == "true" or os.getenv("REPORT_FAILED") == "True"
+        ):
+            print("No appointments found")
+            requests.post(
+                os.getenv("DISCORD_WEBHOOK"), json={"content": "No appointments found"}
+            )
+        print("Sleeping...")
+        time.sleep(60 * 3)  # every 3 minutes

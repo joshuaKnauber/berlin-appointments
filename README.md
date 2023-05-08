@@ -1,10 +1,14 @@
 # Berlin Appointments
 
-Simple fastapi that scrapes appointments for Berlin Bürgerämter. Provides a post and a get endpoint. The post lets you pass in a discord webhook url.
-This is the setup I'm using, it will notify @everyone in a specific channel with all new appointments.
+Simple script that scrapes appointments for Berlin Bürgerämter.
+Lets you provide a discord webhook url and the service id. It will notify @everyone with a list of dates and a url.
+
+If you provide an empty location id a list of all possible locations in berlin will be used. This only exists for some appointments though, for e.g. Personalausweis abholen you need to specify the one you want.
+
+You can get the service id and location id by copying the url from the appointment page. Go to a page like [this](https://service.berlin.de/dienstleistung/324325/) for your service. In this case you would copy _324325_ from the page url as the service id. Right clicking one of the _Termin buchen_ buttons you can get the number after _dienstleister=_, for e.g. Schöneberg this would be _329863_.
 
 ## Deployment
 
-I set this up to be as simple to run as possible, you can modify it to whatever you need.
+I set this up to be as simple to run as possible, you can modify it to your needs.
 
-I have this repo deployed on hop.io (literally just select it and that's it). From there you can add a gateway (also a one click thing) and use that url with something like upstash. With that I just hit the endpoint every 3 minutes which sends me a message if there are new appointments. It's super easy to turn on when needed and to configure the post request on upstash.
+I have this repo deployed on hop.io (literally just select it and that's it). When you don't need it just delete the container and trigger a rollout when you need it. You can set the environment variables there. Make sure to trigger a rollout after you change them.
