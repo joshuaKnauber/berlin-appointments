@@ -7,6 +7,8 @@ If you provide an empty location id a list of all possible locations in berlin w
 
 You can get the service id and location id by copying the url from the appointment page. Go to a page like [this](https://service.berlin.de/dienstleistung/324325/) for your service. In this case you would copy _324325_ from the page url as the service id. Right clicking one of the _Termin buchen_ buttons you can get the number after _dienstleister=_, for e.g. Schöneberg this would be _329863_.
 
+This now also supports resend to send emails instead of discord messages. You can set the recepients and api key in the environment variables.
+
 ## Deployment
 
 I set this up to be as simple to run as possible, you can modify it to your needs.

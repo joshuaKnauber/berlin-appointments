@@ -4,9 +4,11 @@ from typing import List
 import time
 from dotenv import load_dotenv
 import os
+import resend
 
 
 load_dotenv()
+resend.api_key = os.getenv("RESEND_API_KEY")
 
 
 def get_url(serviceId: str, locationId: str) -> str:
@@ -31,31 +33,55 @@ def get_appointments(url: str) -> List[str]:
     return dates
 
 
-def get_discord_message(url: str) -> str:
+def get_message(url: str, discord: bool) -> str:
     try:
         dates = get_appointments(url)
         if dates:
             dateString = "\n- ".join(dates)
-            return f"@everyone **New appointments available:**\n- {dateString}\n\n{url}"
+            if discord:
+                return f"@everyone **New appointments available:**\n- {dateString}\n\n{url}"
+            else:
+                return f"New appointments available:\n- {dateString}\n\n{url}"
         return ""
     except Exception as e:
         return f"Something went wrong: {e}"
+
+
+def send_discord_message(message: str):
+    requests.post(os.getenv("DISCORD_WEBHOOK"), json={"content": message})
+
+
+def send_email(message: str):
+    params: resend.Emails.SendParams = {
+        "from": f"Bürgeramt Appointments <{os.getenv('RESEND_SENDER')}>",
+        "to": os.getenv("RESEND_RECIPIENTS").split(","),
+        "subject": "New Appointments Report",
+        "html": f"<p>{message}</p>",
+    }
+    resend.Emails.send(params)
 
 
 if __name__ == "__main__":
     while True:
         print("Checking for appointments...")
         url = get_url(os.getenv("SERVICE_ID"), os.getenv("LOCATION_ID"))
-        msg = get_discord_message(url)
+        msg = get_message(url, os.getenv("RESEND_API_KEY") == None)
         if msg:
             print("Found appointments!")
-            requests.post(os.getenv("DISCORD_WEBHOOK"), json={"content": msg})
+            if os.getenv("RESEND_API_KEY"):
+                send_email(msg)
+            else:
+                send_discord_message(msg)
+            print("Sent message")
         elif (
             os.getenv("REPORT_FAILED") == "true" or os.getenv("REPORT_FAILED") == "True"
         ):
             print("No appointments found")
-            requests.post(
-                os.getenv("DISCORD_WEBHOOK"), json={"content": "No appointments found"}
-            )
+            if os.getenv("RESEND_API_KEY"):
+                send_email("No appointments found")
+            else:
+                send_discord_message("No appointments found")
         print("Sleeping...")
-        time.sleep(60 * 3)  # every 3 minutes
+        time.sleep(
+            int(os.getenv("INTERVAL")) if os.getenv("INTERVAL") else 60 * 3
+        )  # every 3 minutes or env
