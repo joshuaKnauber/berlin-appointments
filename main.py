@@ -63,25 +63,25 @@ def send_email(message: str):
 
 if __name__ == "__main__":
     while True:
-        print("Checking for appointments...")
+        print("Checking for appointments...", flush=True)
         url = get_url(os.getenv("SERVICE_ID"), os.getenv("LOCATION_ID"))
         msg = get_message(url, os.getenv("RESEND_API_KEY") == None)
         if msg:
-            print("Found appointments!")
+            print("Found appointments!", flush=True)
             if os.getenv("RESEND_API_KEY"):
                 send_email(msg)
             else:
                 send_discord_message(msg)
-            print("Sent message")
+            print("Sent message", flush=True)
         elif (
             os.getenv("REPORT_FAILED") == "true" or os.getenv("REPORT_FAILED") == "True"
         ):
             print("No appointments found")
             if os.getenv("RESEND_API_KEY"):
-                send_email("No appointments found")
+                send_email("No appointments found", flush=True)
             else:
                 send_discord_message("No appointments found")
-        print("Sleeping...")
+        print("Sleeping...", flush=True)
         time.sleep(
             int(os.getenv("INTERVAL")) if os.getenv("INTERVAL") else 60 * 3
         )  # every 3 minutes or env
